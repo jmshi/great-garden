@@ -2,9 +2,9 @@
 title: Welcome to Shi family
 ---
 
-<!-- This is a blank Quartz installation.
+This is a blank Quartz installation.
 See the [documentation](https://quartz.jzhao.xyz) for how to get started.
--->
+
 # bsical obsidian flavored markdown
 internal link: [[https://help.obsidian.md/Editing+and+formatting/Basic+formatting+syntax]]
 
