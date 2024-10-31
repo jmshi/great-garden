@@ -4,11 +4,18 @@ title: Welcome to Shi family
 
 This is a blank Quartz installation.
 See the [documentation](https://quartz.jzhao.xyz) for how to get started.
+tldr: 
+* use `npx quartz build --serve` to build locally and view at `localhost:8080`.
+* use `npx quartz sync [--commit]` to upload local changes to remote github, where `--commit`  is whether you would like to make a commit or not.
 
-# bsical obsidian flavored markdown
+# doc on obsidian flavored markdown
 internal link: [[https://help.obsidian.md/Editing+and+formatting/Basic+formatting+syntax]]
 
 [markdown link](https://help.obsidian.md/Editing+and+formatting/Basic+formatting+syntax)
+
+# doc on sublime text editor
+[https://www.sublimetext.com/docs/](https://www.sublimetext.com/docs/) 
+* cmd + s: save the file (use this to get auto reload of the page we are editing)
 
 # A showcase [[https://ericdarve.github.io/NLA/Why-eigenvalues]]
 [[Eigenvalues|Eigenvalues]] turn a matrix multiplication into a multiplication by a scalar:
