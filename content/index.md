@@ -11,15 +11,11 @@ tldr:
 # doc on obsidian flavored markdown
 internal link: [[https://help.obsidian.md/Editing+and+formatting/Basic+formatting+syntax]]
 
-[markdown link](https://help.obsidian.md/Editing+and+formatting/Basic+formatting+syntax)  
-see [[test-page.md]] for more examples.
+[markdown link](https://help.obsidian.md/Editing+and+formatting/Basic+formatting+syntax)
 
 # doc on sublime text editor
 [https://www.sublimetext.com/docs/](https://www.sublimetext.com/docs/) 
 * cmd + s: save the file (use this to get auto reload of the page we are editing)
-
-# Latex math symbols
-[Latex link]()
 
 # A showcase [[https://ericdarve.github.io/NLA/Why-eigenvalues]]
 [[Eigenvalues|Eigenvalues]] turn a matrix multiplication into a multiplication by a scalar:
@@ -42,7 +38,7 @@ where $f(\Lambda)$ is a diagonal matrix with entries $f(\lambda_i)$.
 
 Eigenvalues are very useful to study time-evolving systems. Consider
 $$
-\frac{dx}{dt} = Mx
+\frac{dx}{dt} = M x
 $$
 We can formally write the solution in the form:
 $$
