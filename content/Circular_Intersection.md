@@ -1,6 +1,6 @@
 ---
 title: Circular Intersections
-draft: true
+draft: false
 tags:
   - math
 ---
