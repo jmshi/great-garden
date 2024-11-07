@@ -1,3 +1,9 @@
+---
+title: Circular Intersections
+draft: true
+tags:
+  - math
+---
 # Circular Intersections
 ## How I started this problem
 One day I was writing my school HW where I had to fill out a venn diagram contrasting to people. Because the middle section soon ran out of space, I thought: *How can I make all three sections the same?*
