@@ -6,10 +6,10 @@ tags:
 ---
 # Circular Intersections
 ## How I started this problem
-One day I was writing my school HW where I had to fill out a venn diagram contrasting to people. Because the middle section soon ran out of space, I thought: *How can I make all three sections the same?*
+One day I was writing my school HW where I had to fill out a venn diagram contrasting the two presidential candidates(of the US). Because the middle section was smaller than the other two in the venn diagram, it soon ran out of space, so I thought: *If I designed a venn diagram, I should make all three sections have the same area to prevent the problem. But how? *
 ## Problem
-When taking two congruent circles, when are the area's of the intersection of the two circles equal to the un intersected section of one circle?
-
+This problem is actually well defined in math. When taking two congruent circles, when are the area of the intersection of the two circles equal to the un-intersected section of one circle?
+Now, we start with two congruent circles of radius 1 and centers at $P$ and $Q$ respectively. The two intersection points between the circles are $A$ and $B$. Now, let the midpoint of $\overline{PQ}$ be $O$(It is also the intersection point between $\overline{PQ}$ and $\overline{AB}$). Now, denote line segment $\overline{PO}$ as $k$ and $\angle APO$ as $\theta$.
 ![[venn_diagram2.png|400]]
 ## Solution
 
