@@ -23,8 +23,8 @@ see [[test-page.md]] for more examples.
 * cmd + s: save the file (use this to get auto reload of the page we are editing)
 
 # Latex math symbols
-[Latex link]()
-
+[Latex link](https://en.wikibooks.org/wiki/LaTeX/Mathematics)
+[Dextify](https://detexify.kirelabs.org/classify.html)
 # A showcase [[https://ericdarve.github.io/NLA/Why-eigenvalues]]
 [[Eigenvalues|Eigenvalues]] turn a matrix multiplication into a multiplication by a scalar:
 $$
