@@ -2,7 +2,7 @@
 title: Ford Theater
 draft: false
 tags:
-  - 
+  - history
 ---
 
 During the Thanksgiving break, I went to Ford Theater, in Washington D.C., and learned a lot about the assassination of President Abraham Lincoln. Here’s what happened:
