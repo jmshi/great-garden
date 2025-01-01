@@ -38,3 +38,18 @@ void main() {
 var n = 0;
 n ++;
 ```
+
+let's embed an animation:
+
+<video src="videos/test.mov" width="240" height="240" controls></video>
+
+this would work if hosted movie such as from youtube:
+```
+<iframe width="560" height="315" src="https/link/to/movie" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+```
+```
+[![alt text](https://img.youtube.com/vi/video-id/0.jpg)](https://www.youtube.com/watch?v=video-id)
+```
+
+![alt text|100](videos/test.mov)
+
