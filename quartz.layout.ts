@@ -48,6 +48,7 @@ export const defaultContentPageLayout: PageLayout = {
     Component.DesktopOnly(Component.TableOfContents()),
     Component.Backlinks(),
   ],
+  // pageSpecificLayouts removed from here
 }
 
 // components for pages that display lists of pages  (e.g. tags or folders)
@@ -62,3 +63,16 @@ export const defaultListPageLayout: PageLayout = {
   ],
   right: [],
 }
+
+// Commented out the entire pageSpecificLayouts export
+// export const pageSpecificLayouts = {
+//   "pushy-block-game": { // Key changed to "pushy-block-game"
+//     head: Component.Head(),
+//     header: [],
+//     beforeBody: [],
+//     pageBody: Component.IframeGame(), // Changed to IframeGame
+//     left: [],
+//     right: [],
+//     footer: [],
+//   },
+// }
