@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Program exported to HTML using the KA Project Exporter by @MushyAvocado 
+https://www.khanacademy.org/computer-programming/ka-project-exporter/5195486791385088
+-->
+	
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<title>If you can get 20 seconds, you are godly. </title>
+	<style>
+		
+		
+		/* Change the color as you want */
+		:root {
+			--background-color: #000000;
+		}
+		
+		
+		html, body, #wrapper {
+			overflow: hidden;
+			width: 100%;
+		    height: 100%;
+			margin: 0px;
+			padding: 0px;
+		    width: calc(100% + 1px);
+		}
+		
+		body {
+		    background-color: var(--background-color);
+		}
+		
+		
+		canvas {
+			width: fit-content;
+			height: fit-content;
+		}
+		
+		canvas:focus {
+			outline: none;
+		}
+		
+		/* Automatically fits to the remaining height and centers the canvas it contains */
+		#wrapper {
+			padding: 0px;
+			margin: 0px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 100%;
+		}
+		
+</style>
+</head>
+<body id="wrapper">
+    <!-- Canvases with a class of "sketch" are applied to the program in the order runPJS() is called. -->
+    <canvas class="sketch"></canvas>
+	<!-- Load the PJS library -->
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/Khan/processing-js@master/processing.js"></script>
+	<!-- The exporter script must be loaded before the program script -->
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/Mushy-Avocado/KA-exporter@v1.0.1/exporter.js"></script>
+	<!-- Run Khan Academy program and import PJS -->
+	<script type="application/javascript">
+		
+		
+		function program() {
+		    
+		    title("If you can get 20 seconds, you are godly. ");
+		    size(400, 400);
+		    
+		    // All code goes here
+			/*
+			Lead(report scores in t&t please):
+			1. Torry_the_math_coder 18.927 seconds
+			2. Arden Dragon(me) 10.210 seconds
+			3. AksharLEO 9.9 seconds
+			4. Aaron but dumber 9.565 seconds
+			5. Blueberrypancakez 9.387 seconds
+			6. Dipper98 8.081 seconds
+			7. StrikingJedi 7.226 seconds
+			8. LemonTurtle 7.000 seconds
+			9. Primasaur 6.2 seconds
+			*/
+			
+			function pixelparticle(img, x, y){
+			    this.x = x;
+			    this.y = y;
+			    this.img = img;
+			    this.xVel = random(-1, 1);
+			    this.yVel = random(-1, 1);
+			}
+			pixelparticle.prototype.move = function(x, y){
+			    this.x += this.xVel;
+			    this.y += this.yVel;
+			    image(this.img, this.x + x, this.y + y);
+			};
+			var Winston = function(faceX, faceY) {
+				pushMatrix();
+				translate(faceX, faceY);
+				scale(16/300);
+			    fill(255, 255, 0);
+				ellipse(0, 0, 300, 300);// face 
+				fill(46, 46, 41);
+				ellipse(-45, -57, 40, 40); // eyes 
+				ellipse(102, -66, 40, 40);
+				fill(252, 65, 65);
+				ellipse(55, 32, 120, 136); // mouth
+			    popMatrix();
+			};
+			var pixels = [];
+			background(0, 0, 0);
+			Winston(8, 8);
+			for(var i = 0;i < 16;i += 2){
+			    for(var j = 0;j < 16;j += 2){
+			        var a = get(i, j, 2, 2);
+			        pixels.push(new pixelparticle(a, i, j));
+			    }
+			}
+			function ceilfloor(n){
+			    if(n > 0){
+			        return ceil(n);
+			    }else if(n === 0){
+			        return ceilfloor(random(-1, 1));
+			    }
+			    return floor(n);
+			}
+			rectMode(CENTER);
+			var dotinrect = function(x1, y1, w, h, x2, y2){
+			    if(x2 > x1 && x2 < x1 + w && y2 > y1 && y2 < y1 + h){
+			        return true;
+			    }
+			    return false;
+			};
+			var dotinellipse = function(x1, y1, r, x2, y2){
+			    if(dist(x1, y1, x2, y2) < r){
+			        return true;
+			    }
+			    return false;
+			};
+			var keys = [];
+			var Player = function(x, y) {
+			    this.x = x;
+			    this.y = y;
+			    this.dead = false;
+			};
+			Player.prototype.draw = function() {
+				noStroke();
+			    fill(255, 255, 0);
+			    //rect(this.x, this.y, 16, 16);
+			    //image(getImage("creatures/Winston"), this.x - 8, this.y - 8, 16, 16);
+			    Winston(this.x, this.y);
+			    if(this.dead){
+			        fill(0, 0, 0);
+			        stroke(0, 0, 0);
+			        rect(this.x, this.y, 16, 16);
+			        //image(getImage("creatures/OhNoes"), this.x - 8, this.y - 8, 16, 16);
+			        for(var i = 0;i < pixels.length;i++){
+			            pixels[i].move(this.x - 8, this.y - 8);
+			        }
+			    }
+			    this.x = constrain(this.x, 8, 392);
+			    this.y = constrain(this.y, 8, 392);
+			};
+			Player.prototype.move = function() {
+			    if(this.dead){
+			        return 0;
+			    }
+			    if(keys[UP]){
+			        this.y -= 2;
+			    }
+			    if(keys[RIGHT]){
+			        this.x += 2;
+			    }
+			    if(keys[DOWN]){
+			        this.y += 2;
+			    }
+			    if(keys[LEFT]){
+			        this.x -= 2;
+			    }
+			};
+			var KillerDot = function(player){
+			    if(random(0, 1) < 0.5){
+			        if(random(0, 1) < 0.5){
+			            this.x = random(-100, 0);
+			        }else{
+			            this.x = random(400, 500);
+			        }
+			        this.y = random(-100, 500);
+			    }else{
+			        if(random(0, 1) < 0.5){
+			            this.y = random(-100, 0);
+			          }else{
+			            this.y = random(400, 500);
+			        }
+			        this.x = random(-100, 500);        
+			    }
+			    this.speed = random(-1.5, 1.5);
+			    this.slope = (this.x - player.x + random(-25, 25)) / (this.y - player.y + random(-25, 25));
+			    this.xVel = this.speed;
+			    this.yVel = this.speed / ceilfloor(this.slope);
+			    this.player = player;
+			};
+			KillerDot.prototype.draw = function(p) {
+			    strokeWeight(3);
+			    stroke(255, 255, 189);
+			    point(this.x, this.y);
+			    if(this.player.dead){
+			        return 0;
+			    }
+			    this.x += this.xVel;
+			    this.y += this.yVel;
+			    this.kill();
+			};
+			KillerDot.prototype.kill = function() {
+			    if(dotinellipse(this.player.x, this.player.y, 8, this.x, this.y)){
+			        this.player.dead = true;
+			        playSound(getSound("retro/boom1"));
+			    }
+			};
+			var soundplay = false;
+			var p = new Player(width / 2, height / 2);
+			var n = new KillerDot(p);
+			var dots = [];
+			var m = 0;
+			draw = function() {
+			    if(keys[ENTER] && p.dead){
+			        pixels = [];
+					background(0, 0, 0);
+					Winston(8, 8);
+					for(var i = 0;i < 16;i += 2){
+				    	for(var j = 0;j < 16;j += 2){
+				   	    	var a = get(i, j, 2, 2);
+				   	    	pixels.push(new pixelparticle(a, i, j));
+				   		}
+					}
+			        p.dead = false;
+			        dots = [];
+			        m = 0;
+			        background(0, 0, 0);
+			        p.x = 200;
+			        p.y = 200;
+			    }
+			    background(0, 0, 0);
+			    p.draw();
+			    p.move();
+			    for(var i = 0;i < dots.length;i++){
+			        dots[i].draw();
+			        if(dots[i].x < -100 || dots[i].y < -100 || dots[i].x > 500 || dots[i].y > 500){
+			            dots.splice(i, 1);
+			        }
+			    }
+			    dots.push(new KillerDot(p));
+			    if(p.dead){
+			        
+			        fill(255, 255, 255, 155);
+			        textAlign(CENTER, CENTER);
+			        textFont(createFont("Comic Sans MS"), 92);
+			        text("You Died", 200, 200);
+			        textSize(19);
+			        text("Press enter to restart", 200, 267);
+			    }
+			    fill(255, 255, 255);
+			    textSize(10);
+			    text(m/62, 361, 11);
+			    if(!p.dead){
+			        m ++;
+			    }
+			};
+			keyPressed = function(){
+			    keys[keyCode] = true;
+			};
+			keyReleased = function(){
+			    keys[keyCode] = false;
+			};
+		}
+		
+		runPJS(program);
+		
+		// Add reload button on KA --> <script>
+		
+	</script>
+</body>
+
+</html>
