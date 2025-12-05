@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Program exported to HTML using the KA Project Exporter by @MushyAvocado 
+https://www.khanacademy.org/computer-programming/ka-project-exporter/5195486791385088
+-->
+	
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<title>A Puzzle A Day (July 4th version)</title>
+	<style>
+		
+		
+		/* Change the color as you want */
+		:root {
+			--background-color: #000000;
+		}
+		
+		
+		html, body, #wrapper {
+			overflow: hidden;
+			width: 100%;
+		    height: 100%;
+			margin: 0px;
+			padding: 0px;
+		    width: calc(100% + 1px);
+		}
+		
+		body {
+		    background-color: var(--background-color);
+		}
+		
+		
+		canvas {
+			width: fit-content;
+			height: fit-content;
+		}
+		
+		canvas:focus {
+			outline: none;
+		}
+		
+		/* Automatically fits to the remaining height and centers the canvas it contains */
+		#wrapper {
+			padding: 0px;
+			margin: 0px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 100%;
+		}
+		
+</style>
+</head>
+<body id="wrapper">
+    <!-- Canvases with a class of "sketch" are applied to the program in the order runPJS() is called. -->
+    <canvas class="sketch"></canvas>
+	<!-- Load the PJS library -->
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/Khan/processing-js@master/processing.js"></script>
+	<!-- The exporter script must be loaded before the program script -->
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/Mushy-Avocado/KA-exporter@v1.0.1/exporter.js"></script>
+	<!-- Run Khan Academy program and import PJS -->
+	<script type="application/javascript">
+		
+		
+		function program() {
+		    
+		    title("A Puzzle A Day (July 4th version)");
+		    size(600, 600);
+		    
+		    // All code goes here
+			/*
+			Credit: DragonFjord made the game idea. I have a hard copy of the game at home. If you want one, search it online
+			if you want the solution, https://keiichiw.github.io/a-puzzle-a-day-solver/
+			*/
+			var name = "";
+			
+			// global vars {
+			var click = false;
+			var keys = [];
+			var keytick = [];
+			var scene = "game";
+			var scene_images = [];
+			var firework_list = [];
+			var months = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "June", "July", "Aug.", "Sept.", "Oct.", "Nov.", "Dec."];
+			var covered_months = [false, false, false, false, false, false, false, false, false, false, false, false];
+			var covered_days = [false, false, false, false, false, false, false, false, false, false, false, false,false, false, false, false, false, false, false, false, false, false, false, false,false, false, false, false, false, false, false];
+			var covered_squares = [];
+			textFont(createFont("sans-serif"));
+			//}
+			
+			background(255, 255, 255);
+			
+			for(var i = 0;i < 600;i += 5) {
+			    for(var j = 0;j < 600;j += 5) {
+			        fill(lerpColor(color(0, 100, 255), color(100, 50, 0), (i + j) / 1200));
+			        noStroke();
+			        rect(i, j, 5, 5);
+			    }
+			}
+			var bg = get(0, 0, 600, 600);
+			
+			// button {
+			function mouse_rect(x, y, w, h) {
+			    if(mouseX > x && mouseX < x + w && mouseY > y && mouseY < y + h) {
+			        return true;
+			    }
+			    return false;
+			}
+			function get_foci_dist(a, b){
+			    if(a > b){
+			        return sqrt(a * a / 4 - b * b / 4);
+			    }else{
+			        return sqrt(b * b / 4 - a * a / 4);        
+			    }
+			}
+			function Button(x, y, w, h, type){
+			    this.x = x;
+			    this.y = y;
+			    this.w = w;
+			    this.h = h;
+			    this.type = type;
+			    this.scale = 1;
+			}
+			Button.prototype.draw = function(col1, col2, txt) {
+			    fill(lerpColor(col1, col2, 10 * (this.scale - 1)));
+			    pushMatrix();
+			        translate(this.x, this.y);
+			        scale(this.scale);
+			        if(this.inside()){
+			            if(this.scale < 1.1){
+			                this.scale += 0.02;
+			            }
+			        }else{
+			            if(this.scale > 1){
+			                this.scale -= 0.02;
+			            }
+			        }
+			        strokeWeight(3);
+			        stroke(lerpColor(col1, col2, 1 - 10 * (this.scale - 1)));
+			        if(this.type === 'rect'){
+			            rectMode(CENTER);
+			            rect(0, 0 , this.w, this.h, 5);
+			        }else if(this.type === 'ellipse'){
+			            ellipse(0, 0, this.w, this.h);
+			        }
+			        textAlign(CENTER, CENTER);
+			        fill(lerpColor(col1, col2, 1 - 10 * (this.scale - 1)));
+			        textSize(sqrt(this.w * this.h) / (txt.length / log(txt.length + 1)));
+			        text(txt, 0, 0);
+			    popMatrix();
+			    textSize(12);
+			    rectMode(CORNER);
+			    strokeWeight(1);
+			    
+			};
+			Button.prototype.inside = function(){
+			    if(this.type === 'rect'){
+			        return mouse_rect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
+			    }else if(this.type === 'ellipse'){
+			        var foci_dist = get_foci_dist(this.w, this.h);
+			        var foci;
+			        if(this.w > this.h){
+			            foci = [this.x - foci_dist, this.y, this.x + foci_dist, this.y];
+			        }else{
+			            foci = [this.x, this.y - foci_dist, this.x, this.y + foci_dist];
+			        }
+			        if(dist(mouseX, mouseY, foci[0], foci[1]) + dist(mouseX, mouseY, foci[2], foci[3]) <= max(this.w, this.h)){
+			            return true;
+			        }
+			    }
+			    return false;
+			};
+			Button.prototype.click = function(to, from){
+			    if(this.inside() && scene === from && click){
+			        if(scene_images.length > 0) {
+			            return 0;
+			        }
+			        for(var i = 0;i < width;i += 40) {
+			            for(var j = 0;j < height;j += 40) {
+			                scene_images.push([get(i, j, 40, 40), i, j]);
+			            }
+			        }
+			        scene = to;
+			    }
+			};
+			//}
+			
+			// {
+			function firework_particle(x, y, col) {
+			    this.x = x;
+			    this.y = y;
+			    this.direc = random(0, 360);
+			    this.magnitude = random(0, 10);
+			    this.xs = cos(this.direc) * this.magnitude;
+			    this.ys = sin(this.direc) * this.magnitude;
+			    this.col = col;
+			    this.life = 200;
+			}
+			firework_particle.prototype.draw = function() {
+			    noStroke();
+			    fill(this.col);
+			    
+			    ellipse(this.x, this.y, 5, 5);
+			    this.x += this.xs;
+			    this.y += this.ys;
+			    this.xs = lerp(this.xs, 0, 0.07);
+			    this.ys = lerp(this.ys, 0, 0.07);
+			    this.ys += random(0.1, 0.2);
+			    this.life -= this.ys * random(0.5, 2);
+			};
+			var cols = [
+			color(255, 0, 0),
+			color(255, 255, 255),
+			color(0, 0, 255),
+			];
+			function firework() {
+			    this.x = random(0, 600);
+			    this.y = 450;
+			    this.ys = -10;
+			    this.xs = random(-1, 1);
+			    this.col = cols[floor(random(0, 3))];
+			    this.burst = false;
+			    this.parts = [];
+			}
+			firework.prototype.draw = function() {
+			    if(!this.burst) {
+			        fill(this.col);
+			        ellipse(this.x, this.y, 3, 3);
+			        if(this.y < 100) {
+			            this.burst = true;
+			            for(var i = 0;i < 100;i ++) {
+			                this.parts.push(new firework_particle(this.x, this.y, this.col));
+			            }
+			        }
+			    }else {
+			        for(var i = 0;i < this.parts.length;i ++) {
+			            this.parts[i].draw();
+			            if(this.parts[i].life < 0) {
+			                this.parts.splice(i, 1);
+			            }
+			        }
+			    }
+			    this.x += this.xs;
+			    this.y += this.ys;
+			    this.ys -= 0.1;
+			};
+			//} fireworks
+			
+			// 8 pieces {
+			var l_piece = [
+			[1, 0, 0, 0],
+			[1, 0, 0, 0], 
+			[1, 0, 0, 0], 
+			[1, 1, 0, 0]
+			];
+			var one_pronged_piece = [
+			[1, 0, 0, 0],
+			[1, 0, 0, 0], 
+			[1, 1, 0, 0], 
+			[0, 1, 0, 0]
+			];
+			var corner_piece = [
+			[1, 0, 0],
+			[1, 0, 0], 
+			[1, 1, 1], 
+			];
+			var rect_piece = [
+			[1, 1, 0],
+			[1, 1, 0], 
+			[1, 1, 0], 
+			];
+			var z_piece = [
+			[1, 0, 0],
+			[1, 1, 1], 
+			[0, 0, 1], 
+			];
+			var thumb_piece = [
+			[1, 0, 0],
+			[1, 1, 0], 
+			[1, 1, 0], 
+			];
+			var u_piece = [
+			[1, 1, 0],
+			[1, 0, 0], 
+			[1, 1, 0], 
+			];
+			var key_piece = [
+			[1, 0, 0, 0],
+			[1, 0, 0, 0], 
+			[1, 1, 0, 0], 
+			[1, 0, 0, 0]
+			];
+			var piece_mapping = {
+			"l": l_piece,
+			"p": one_pronged_piece,
+			"c": corner_piece,
+			"r": rect_piece,
+			"z": z_piece, 
+			"th": thumb_piece,
+			"u": u_piece,
+			"k": key_piece
+			};
+			var pieces = [];
+			var piece_names = ["l", "p", "c", "r", "z", "th", "u", "k"];
+			var colors = [color(230, 4, 0), color(0, 184, 83), color(37, 73, 219), color(255, 140, 0)];
+			var color_mapping = {
+			"l": 3,
+			"p": 0,
+			"c": 1,
+			"r": 2,
+			"z": 1, 
+			"th": 3,
+			"u": 0,
+			"k": 2
+			};
+			// }
+			
+			// different operations{
+			
+			// Helpful Operators{
+			function empty(piece) {
+			    var result_piece = [];
+			    for(var i = 0;i < piece.length;i ++) {
+			        var add = [];
+			        for(var j = 0;j < piece[i].length;j ++) {
+			            add.push(0);
+			        }
+			        result_piece.push(add);
+			    }
+			    return result_piece;
+			}
+			function print_piece(piece) {
+			    for(var i = 0;i < piece.length;i ++) {
+			        println(piece[i]);
+			    }
+			}
+			
+			// }
+			
+			// Flip{
+			// Vertical:
+			function vertical_flip(piece) {
+			    var result_piece = empty(piece);
+			    for(var i = 0;i < piece.length;i ++) {
+			        for(var j = 0;j < piece[i].length;j ++) {
+			            if(piece[i][j] === 1) {
+			                result_piece[piece.length - 1 - i][j] = 1;
+			            }
+			        }
+			    }
+			    return result_piece;
+			}
+			// Horizontal:
+			function horizontal_flip(piece) {
+			    var result_piece = empty(piece);
+			    for(var i = 0;i < piece.length;i ++) {
+			        for(var j = 0;j < piece[i].length;j ++) {
+			            if(piece[i][j] === 1) {
+			                result_piece[i][piece[i].length - 1 - j] = 1;
+			            }
+			        }
+			    }
+			    return result_piece;
+			}
+			// }
+			
+			// Rotate{
+			function clockwise(piece) {
+			    var n = piece.length;
+			    var result_piece = [];
+			    for (var i = 0;i < n; i ++) {
+			        var new_row = [];
+			        for (var j = n - 1; j >= 0; j --) {
+			            new_row.push(piece[j][i]);
+			        }
+			        result_piece.push(new_row);
+			    }
+			    return result_piece;
+			}
+			function counterclockwise(piece) {
+			    return clockwise(horizontal_flip(vertical_flip(piece)));
+			}
+			// }
+			
+			// }
+			
+			function combine(l1, l2) {
+			    var lst = [];
+			    for(var i = 0;i < l1.length;i ++) {
+			        lst.push(l1[i]);
+			    }
+			    for(var i = 0;i < l2.length;i ++) {
+			        lst.push(l2[i]);
+			    }
+			    return lst;
+			}
+			function nin(n, l) {
+			    var go = false;
+			    for(var i = 0;i < l.length;i ++) {
+			        if(l[i][0] === n[0] && l[i][1] === n[1]) {
+			            if(!go) {
+			                go = true;
+			            } else {
+			                return false;
+			            }
+			        } 
+			    }
+			    return go;
+			}
+			function findfalse(l) {
+			    var go = false;
+			    var num = 0;
+			    for(var i = 0;i < l.length;i ++) {
+			        if(!l[i] && !go) {
+			            go = true;
+			            num = i;
+			        } else if(!l[i]) {
+			            return -1000;
+			        }
+			    }
+			    return num;
+			}
+			function star(x, y, r) {
+			    pushMatrix();
+			    translate(x, y);
+			    rotate(52);
+			    fill(255, 255, 255);
+			    noStroke();
+			    beginShape();
+			    for(var i = 0;i < 10;i ++) {
+			        if(i % 2 === 0) {
+			            vertex(cos(360 * i / 10) * r, sin(360 * i / 10) * r);
+			        } else {
+			            vertex(cos(360 * i / 10) * r / 2, sin(360 * i / 10) * r / 2);
+			        }
+			    }
+			    endShape(CLOSE);
+			    popMatrix();
+			}
+			
+			// piece class {
+			function Piece(x, y, type) {
+			    this.x = round(x);
+			    this.y = round(y);
+			    this.actingx = 0;
+			    this.actingy = 0;
+			    this.type = type;
+			    this.piece = piece_mapping[this.type];
+			    this.ingrid = false;
+			    this.holding = false;
+			    this.col = colors[color_mapping[this.type]];
+			    this.id = random(0, 100000);
+			}
+			Piece.prototype.draw = function() {
+			    this.actingx = 5;
+			    this.actingy = 5;
+			    for(var i = 0;i < this.piece.length;i ++) {
+			        for(var j = 0;j < this.piece[i].length;j ++) {
+			            noStroke();
+			            fill(this.col);
+			            if(this.piece[i][j] === 0) {
+			                noFill();
+			            } else {
+			                if(j < this.actingx) {
+			                    this.actingx = j;
+			                }
+			                if(i < this.actingy) {
+			                    this.actingy = i;
+			                }
+			            }
+			            rect((this.x + j) * 50 + 25, (this.y + i) * 50 + 25, 50, 50);
+			            
+			        }
+			    }
+			    if(this.holding) {
+			        
+			        this.x = (mouseX - 25) / 50 - this.actingx;
+			        this.y = (mouseY - 25) / 50 - this.actingy;
+			        if(keys[LEFT]) {
+			            this.piece = counterclockwise(this.piece);
+			        }
+			        if(keys[RIGHT]) {
+			            this.piece = clockwise(this.piece);
+			        }
+			        if(keys[UP]) {
+			            this.piece = vertical_flip(this.piece);
+			        }
+			        if(keys[SHIFT]) {
+			            this.piece = horizontal_flip(this.piece);
+			        }
+			    }
+			    
+			    
+			};
+			Piece.prototype.ifclick = function() {
+			    if(click) {
+			        if(!this.holding) {
+			            for(var i = 0;i < this.piece.length;i ++) {
+			                for(var j = 0;j < this.piece[i].length;j ++) {
+			                    if(mouse_rect((this.x + j) * 50 + 25, (this.y + i) * 50 + 25, 50, 50) && this.piece[i][j] === 1) {
+			                        this.holding = !this.holding;
+			                        
+			                    }
+			                }
+			            }
+			        } else {
+			            this.x = floor((mouseX - 25) / 50) - this.actingx;
+			            this.y = floor((mouseY - 25) / 50) - this.actingy;
+			            if(this.touching(pieces)) {
+			                this.holding = false;
+			                click = false;
+			            } else {
+			                this.x = (mouseX - 25) / 50 - this.actingx;
+			                this.y = (mouseY - 25) / 50 - this.actingy;
+			                click = false;
+			            }
+			        }
+			        
+			    }
+			};
+			Piece.prototype.touching = function(pieces) {
+			    for(var i = 0;i < pieces.length;i ++) {
+			        if(pieces[i].id !== this.id) {
+			            for(var j = 0;j < this.piece.length;j ++) {
+			                for(var k = 0;k < this.piece[j].length;k ++) {
+			                    if(this.piece[j][k] === 1) {
+			                        for(var l = 0;l < pieces[i].piece.length;l ++) {
+			                            for(var m = 0;m < pieces[i].piece[l].length;m ++) {
+			                                if(pieces[i].piece[l][m] === 1) {
+			                                    if(this.x + k === pieces[i].x + m && this.y + j === pieces[i].y + l) {
+			                                        
+			                                        return false;
+			                                    }
+			                                }
+			                            }
+			                        }
+			                    }
+			                }
+			            }
+			        }
+			    }
+			    return true;
+			};
+			Piece.prototype.coverednums = function() {
+			    var res = [];
+			    for(var i = 0;i <  this.piece.length;i ++) {
+			        for(var j = 0;j < this.piece[i].length;j ++) {
+			            if(this.piece[i][j] === 1) {
+			                res.push([j + this.x, i + this.y]);
+			            }
+			        }
+			    }
+			    return res;
+			    
+			};
+			// }
+			
+			var how_button = new Button(565, 35, 50, 50, "rect");
+			var back_button = new Button(300, 545, 150, 50, "rect");
+			
+			for(var i = 0;i < piece_names.length;i ++) {
+			    pieces.push(new Piece(random(0, 10), random(0, 10), piece_names[i]));
+			}
+			
+			// scenes {
+			
+			function Game() {
+			    
+			    // cull piece list {
+			    var add1 = [];
+			    var add2 = [];
+			    for(var i = 0;i < pieces.length;i ++) {
+			        if(pieces[i].holding) {
+			            add2.push(pieces[i]);
+			        } else {
+			            add1.push(pieces[i]);
+			        }
+			    }
+			    pieces = combine(add1, add2);
+			    // }
+			    
+			    // draw board and deduce covered pieces {
+			    for(var i = 0;i < 7;i ++) {
+			        for(var j = 0;j < 7;j ++) {
+			            fill(0, 0, 0);
+			            if((j >= 3 && i >= 6) || (j >= 6 && i <= 1)) {
+			                
+			            } else {
+			                rect(10 + j * 50, 10 + i * 50, 80, 80);
+			                
+			            }
+			        }
+			    }
+			    covered_months = [false, false, false, false, false, false, false, false, false, false, false, false];
+			    covered_days = [false, false, false, false, false, false, false, false, false, false, false, false,false, false, false, false, false, false, false, false, false, false, false, false,false, false, false, false, false, false, false];
+			    for(var i = 0;i < 7;i ++) {
+			        for(var j = 0;j < 7;j ++) {
+			            fill(0, 0, 0);
+			            stroke(255, 255, 255);
+			            if((j >= 3 && i >= 6) || (j >= 6 && i <= 1)) {
+			                
+			            } else {
+			                rect(25 + j * 50, 25 + i * 50, 50, 50);
+			                fill(255, 255, 255);
+			                textAlign(CENTER, CENTER);
+			                if(i <= 1) {
+			                    if(nin([j, i], covered_squares)) {
+			                        covered_months[i * 6 + j] = true;
+			                    }
+			                    text(months[i * 6 + j], 50 + j * 50, 50 + i * 50); 
+			                } else {
+			                    if(nin([j, i], covered_squares)) {
+			                        covered_days[(i - 2) * 7 + j] = true;
+			                    }
+			                    text((i - 2) * 7 + j + 1, 50 + j * 50, 50 + i * 50); 
+			                }
+			            }
+			        }
+			    }
+			    // }
+			    
+			    // check if win {
+			    if(findfalse(covered_months) + 1 === month()) {
+			        if(findfalse(covered_days) + 1 === day()) {
+			            scene = "win";
+			        }
+			    }
+			    //}
+			    
+			    how_button.draw(color(0, 0, 0), color(120, 120, 120), "?");
+			    how_button.click("how", "game");
+			    
+			    // piece stuff {
+			    covered_squares = [];
+			    for(var i = 0;i < pieces.length;i ++) {
+			        pieces[i].draw();
+			        
+			    }
+			    for(var i = pieces.length - 1;i >= 0;i --) {
+			        pieces[i].ifclick();
+			        covered_squares = combine(covered_squares, pieces[i].coverednums());
+			    }
+			    // }
+			    
+			}
+			
+			function How() {
+			    
+			    fill(0, 0, 0);
+			    textSize(40);
+			    text("Click to hold and drop.\nUse left and right keys to rotate,\nup key to flip vertically,\nand shift key to flip horizontally.\n Your goal is to cover all of the\nsquares EXCEPT for the date.", 300, 300);
+			    
+			    back_button.draw(color(0, 0, 0), color(120, 120, 120), "Back");
+			    back_button.click("game", "how");
+			    
+			}
+			
+			function Win() {
+			    fill(0, 0, 0);
+			    textSize(40);
+			    text("You won! Happy July 4th!", 300, 255);
+			    if(name === "!@#$%^&*()_+") {
+			        text("Happy Birthday Aria!", 300, 200);
+			    }
+			    // firework stuff {
+			    if(frameCount % 50 === 0) {
+			        firework_list.push(new firework());
+			    }
+			    for(var i = 0;i < firework_list.length;i ++) {
+			        firework_list[i].draw();
+			        if(firework_list[i].y > 460) {
+			            firework_list.splice(i, 1);
+			        }
+			    }
+			    // }
+			    
+			    // american flag {
+			    noStroke();
+			    rectMode(CENTER);
+			    fill(174, 29, 47);
+			    rect(300, 400, 330, 174);
+			    for(var i = 0;i < 174;i += 174 / 13) {
+			        if((i * 13 / 174) % 2 === 1) {
+			            fill(255, 255, 255);
+			            rect(300, 400 - 174 / 2 + i + 174 / 26, 330, 174 / 13);
+			        }
+			    }
+			    fill(35, 35, 77);
+			    rect(201, 360, 330 * 2 / 5, 174 * 7 / 13);
+			    fill(255, 255, 255);
+			    for(var i = 0;i < 5;i ++) {
+			        for(var j = 0;j < 6;j ++) {
+			            star(147 + j * 21.4, 324 + i * 174 / 10, 5);
+			        }
+			    }
+			    for(var i = 0;i < 4;i ++) {
+			        for(var j = 0;j < 5;j ++) {
+			            star(157 + j * 21.4, 333 + i * 174 / 10, 5);
+			        }
+			    }
+			    //}
+			    
+			    back_button.draw(color(0, 0, 0), color(120, 120, 120), "Back");
+			    back_button.click("game", "win");
+			    
+			}
+			
+			// }
+			
+			draw = function() {
+			    background(255, 255, 255);
+			    image(bg, 0, 0);
+			    switch(scene) {
+			        case 'game':
+			            Game();
+			        break;
+			        case 'how':
+			            How();
+			        break;
+			        case 'win':
+			            Win();
+			    }
+			    
+			    // keys + mouse + scene {
+			    for(var i = 0;i < 4;i ++) {
+			        scene_images.pop();
+			    }
+			    for(var i = 0;i < scene_images.length;i ++) {
+			        image(scene_images[i][0], scene_images[i][1], scene_images[i][2]);
+			    }
+			    click = false;
+			    if(keytick[keyCode] !== 0) {
+			        keys[keyCode] = false;
+			    }
+			    for(var i = 0;i < keytick.length;i ++) {
+			        if(keytick[i] > 0) {
+			            keytick[i] --;
+			        }
+			    }
+			    // }    
+			};
+			
+			mouseClicked = function() {
+			    click = true;
+			};
+			keyPressed = function() {
+			    if(keytick[keyCode] === 0){
+			        keytick[keyCode] = 8;
+			        keys[keyCode] = true;
+			    }
+			};
+			keyReleased = function() {
+			    keytick[keyCode] = 0;
+			    keys[keyCode] = false;
+			};
+			
+			
+		}
+		
+		runPJS(program);
+		
+		// Add reload button on KA --> <script>
+		
+	</script>
+</body>
+
+</html>

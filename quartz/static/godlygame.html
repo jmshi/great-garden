@@ -214,10 +214,38 @@ https://www.khanacademy.org/computer-programming/ka-project-exporter/51954867913
 			KillerDot.prototype.kill = function() {
 			    if(dotinellipse(this.player.x, this.player.y, 8, this.x, this.y)){
 			        this.player.dead = true;
-			        playSound(getSound("retro/boom1"));
+			        // Play boom sound if audio is unlocked
+			        if(audioUnlocked && boomSound) {
+			            boomSound.currentTime = 0;
+			            boomSound.play().catch(function(error) {
+			                console.log('Audio play prevented:', error);
+			            });
+			        }
 			    }
 			};
 			var soundplay = false;
+			var audioUnlocked = false;
+			var boomSound = null;
+			// Initialize audio
+			try {
+			    boomSound = new Audio('boom2.mp3');
+			    boomSound.load();
+			} catch(e) {
+			    console.log('Audio init error:', e);
+			}
+			// Unlock audio on first user interaction
+			var unlockAudio = function() {
+			    if(!audioUnlocked && boomSound) {
+			        boomSound.play().then(function() {
+			            boomSound.pause();
+			            boomSound.currentTime = 0;
+			            audioUnlocked = true;
+			            console.log('Audio unlocked!');
+			        }).catch(function(error) {
+			            console.log('Audio unlock failed:', error);
+			        });
+			    }
+			};
 			var p = new Player(width / 2, height / 2);
 			var n = new KillerDot(p);
 			var dots = [];
@@ -268,16 +296,31 @@ https://www.khanacademy.org/computer-programming/ka-project-exporter/51954867913
 			};
 			keyPressed = function(){
 			    keys[keyCode] = true;
+			    unlockAudio();
 			};
 			keyReleased = function(){
 			    keys[keyCode] = false;
 			};
+			mousePressed = function(){
+			    unlockAudio();
+			};
 		}
 		
 		runPJS(program);
-		
+
+		// Make canvas clickable and ensure audio unlock works in iframe
+		window.addEventListener('DOMContentLoaded', function() {
+			var canvas = document.querySelector('canvas');
+			if (canvas) {
+				canvas.tabIndex = 1;
+				canvas.addEventListener('click', function() {
+					canvas.focus();
+				});
+			}
+		});
+
 		// Add reload button on KA --> <script>
-		
+
 	</script>
 </body>
 
