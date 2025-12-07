@@ -47,7 +47,7 @@ export const defaultContentPageLayout: PageLayout = {
     Component.Graph(),
     Component.DesktopOnly(Component.TableOfContents()),
     Component.MobileOnly(Component.Explorer()),
-    Component.Backlinks(),
+    Component.DesktopOnly(Component.Backlinks()),
   ],
   // pageSpecificLayouts removed from here
 }
